@@ -1,4 +1,17 @@
 # Writeups
+
+# Writeups
+
+A collection of penetration testing and CTF writeups.
+
+## OffSec Challenges
+
+- [Twiggy](./Twiggy/README.md)
+
+  - [Reconnaissance](./Twiggy/01.%20Twiggy%20-%20Reconnaissance.md)
+  - [Exploitation](./Twiggy/02.%20Twiggy%20-%20Exploitation.md)
+  - [Privilege Escalation](./Twiggy/03.%20Twiggy%20-%20Privilege%20Escalation.md)
+  - [CVE-2020-11651 PoC](./Twiggy/CVE-2020-11651%20PoC.md)
 OSCP Preparation Box Writeups
 
 
