@@ -1,4 +1,4 @@
-name: Temporary Stepwise APK delivery
+name: Remove temporary Stepwise APK artifact
 
 on:
   push:
@@ -8,29 +8,19 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
 
 jobs:
-  deliver:
+  cleanup:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
+    timeout-minutes: 5
     steps:
-      - name: Fetch and verify APK
+      - name: Delete temporary artifact
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --location --retry 5 --retry-all-errors \
-            "https://tempfile.org/vo88NHcFDPF/download" \
-            --output Stepwise-v0.1.0-debug.apk
-          echo "05f41dc8e0cb94fcccfb627de2d69879bd90775b8ca1cb6e8d9428ccf05c5fb0  Stepwise-v0.1.0-debug.apk" | sha256sum -c -
-          test "$(stat -c '%s' Stepwise-v0.1.0-debug.apk)" = "13719733"
-
-      - name: Upload verified APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Stepwise-v0.1.0-debug-apk
-          path: Stepwise-v0.1.0-debug.apk
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 1
+          gh api --method DELETE \
+            "repos/$GITHUB_REPOSITORY/actions/artifacts/9007525899"
