@@ -1,0 +1,37 @@
+name: Temporary Stepwise APK delivery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/stepwise-delivery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Fetch, decode, and verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://tmpfiles.org/dl/wlw2FLSNLohb/stepwise-v0.1.0-debug.apk.b64.txt" \
+            --output Stepwise-v0.1.0-debug.apk.b64.txt
+          base64 --decode Stepwise-v0.1.0-debug.apk.b64.txt > Stepwise-v0.1.0-debug.apk
+          echo "05f41dc8e0cb94fcccfb627de2d69879bd90775b8ca1cb6e8d9428ccf05c5fb0  Stepwise-v0.1.0-debug.apk" | sha256sum -c -
+          test "$(stat -c '%s' Stepwise-v0.1.0-debug.apk)" = "13719733"
+
+      - name: Upload verified APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stepwise-v0.1.0-debug-apk
+          path: Stepwise-v0.1.0-debug.apk
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
