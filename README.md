@@ -24,3 +24,5 @@ This makes it easy to find the appropriate steps and orders them in a neat and o
   - [CVE-2020-11651 PoC](./Twiggy/CVE-2020-11651%20PoC.md)
 
 
+<!-- Temporary Android App Lab transfer pointer; remove after verification. -->
+[TaskApp v0.2.1 transfer](https://litter.catbox.moe/iy9nxu.apk)
