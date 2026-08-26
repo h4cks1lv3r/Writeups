@@ -1,0 +1,37 @@
+name: Temporary TaskApp v0.2.2 delivery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/taskapp-v022-delivery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Fetch and verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            --connect-timeout 15 --max-time 120 --retry 5 --retry-all-errors \
+            "https://litter.catbox.moe/4s884k.apk" \
+            --output TaskApp-v0.2.2-debug.apk
+          echo "febad84d60214178e9fccd1a50b6b28facdd5df6115115143b72e90f93097317  TaskApp-v0.2.2-debug.apk" | sha256sum -c -
+          unzip -t TaskApp-v0.2.2-debug.apk >/dev/null
+
+      - name: Upload verified APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaskApp-v0.2.2-debug-apk
+          path: TaskApp-v0.2.2-debug.apk
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
