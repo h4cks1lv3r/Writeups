@@ -1,0 +1,50 @@
+name: Temporary TaskApp v0.2.2 source delivery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/taskapp-source-v022-delivery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Fetch encoded source parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p parts
+          urls=(
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-00?token=A5M5UQGSN4F42PGKLNEMOULKS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-01?token=A5M5UQHHHA4WJB7MUVUZEEDKS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-02?token=A5M5UQG45SSGVZ5CVXI7HELKS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-03?token=A5M5UQFSS2DWX4ZWQQOANYDKS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-04?token=A5M5UQEQXSQAUUBOY2GW72DKS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-05?token=A5M5UQGWVQ5KEX7AUBQWOC3KS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-06?token=A5M5UQH6ICLTSKZX2XM4BM3KS3FC5AA'
+            'https://raw.githubusercontent.com/h4cks1lv3r/TaskApp/main/.source-export/part-07?token=A5M5UQBAWH54EL66HWZ5O7LKS3FC5AA'
+          )
+          for i in "${!urls[@]}"; do
+            printf -v number '%02d' "$i"
+            curl --fail --silent --show-error --location --retry 5 --retry-all-errors \
+              "${urls[$i]}" --output "parts/part-$number"
+          done
+          cat parts/part-* | base64 -d > TaskApp-v0.2.2-source.zip
+          echo "bb3c1c7541bea370025878e3320609ebe5293fdbd32771e267989f9091185623  TaskApp-v0.2.2-source.zip" | sha256sum -c -
+          unzip -t TaskApp-v0.2.2-source.zip >/dev/null
+
+      - name: Upload verified source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaskApp-v0.2.2-source
+          path: TaskApp-v0.2.2-source.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
